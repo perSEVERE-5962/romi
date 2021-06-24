@@ -21,7 +21,7 @@ public class DriveDistance extends CommandBase {
    * @param drive The drivetrain subsystem on which this command will run
    */
   public DriveDistance(double speed, double inches, Drivetrain drive) {
-    m_distance = inches;
+    m_distance = inches * 0.0254; // convert to meters
     m_speed = speed;
     m_drive = drive;
     addRequirements(drive);
