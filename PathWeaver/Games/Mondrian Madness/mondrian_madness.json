@@ -1,0 +1,10 @@
+{
+    "game": "Mondrian Madness",
+    "field-image": "mondrian_madness.png",
+    "field-corners": {
+      "top-left": [32, 25],
+      "bottom-right": [638, 630]
+    },
+    "field-size": [36, 36],
+    "field-unit": "inches"
+  }

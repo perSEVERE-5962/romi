@@ -16,9 +16,36 @@ public class AutonomousDistance extends SequentialCommandGroup {
    */
   public AutonomousDistance(Drivetrain drivetrain) {
     addCommands(
-        new DriveDistance(-0.5, 10, drivetrain),
-        new TurnDegrees(-0.5, 180, drivetrain),
-        new DriveDistance(-0.5, 10, drivetrain),
-        new TurnDegrees(0.5, 180, drivetrain));
+      /**
+       * Note that for DriveDistance and TurnDegrees the first
+       * parameter is the speed.  For my Romi forward is a positive
+       * value and backwards is a negative value.  It might be 
+       * opposite for you.
+       */
+      //start
+      new DriveDistance(0.6, 17, drivetrain), // drive forward at 60% speed for 17 inches
+      new TurnDegrees(-0.3, 88, drivetrain),  // turn 88 degrees to the left at 30% speed
+      new DriveDistance(0.6, 17, drivetrain), // drive forward at 60% speed for 17 inches
+
+      // at yellow
+      new TurnDegrees(-0.3, 90, drivetrain), // turn 90 degrees to the left at 30% speed
+
+      // enter center
+      new DriveDistance(0.5, 8, drivetrain), // drive forward at 50% speed for 8 inches
+      new TurnDegrees(-0.3, 30, drivetrain), // turn 30 degrees to the left at 30% speed
+      new DriveDistance(0.6, 12, drivetrain), // drive forward at 60% speed for 12 inches
+      new TurnDegrees(0.3, 35, drivetrain), // turn 35 degrees to the right at 30% speed
+      new DriveDistance(0.5, 6, drivetrain), // drive forward at 50% speed for 6 inches
+
+      // in blue
+      new TurnDegrees(0.3, 90, drivetrain), // turn 90 degrees to the right at 30% speed
+      new DriveDistance(0.6, 15.5, drivetrain), // drive forward at 60% speed for 15.5 inches
+
+      // in corner
+      new TurnDegrees(0.3, 87, drivetrain), // turn 87 degrees to the right at 30% speed
+      new DriveDistance(0.6, 15.5, drivetrain) // drive forward at 60% speed for 15.5 inches
+
+      // done - in red
+      );
   }
 }
