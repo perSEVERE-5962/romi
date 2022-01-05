@@ -4,8 +4,12 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -28,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -42,6 +47,9 @@ import edu.wpi.first.wpilibj2.command.button.Button;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private Trajectory exampleTrajectory;
+  private static final String trajectoryJSON = "paths/test.wpilib.json";
+  
   // The robot's subsystems and commands are defined here...
   private final Drivetrain m_drivetrain = new Drivetrain();
   private final OnBoardIO m_onboardIO = new OnBoardIO(ChannelMode.INPUT, ChannelMode.INPUT);
@@ -79,37 +87,16 @@ public class RobotContainer {
    * @return A SequentialCommand that sets up and executes a trajectory following Ramsete command
    */
   private Command generateRamseteCommand() {
-    var autoVoltageConstraint =
-        new DifferentialDriveVoltageConstraint(
-            new SimpleMotorFeedforward(DriveConstants.ksVolts, 
-                                       DriveConstants.kvVoltSecondsPerMeter, 
-                                       DriveConstants.kaVoltSecondsSquaredPerMeter),
-            DriveConstants.kDriveKinematics,
-            10);
-
-    TrajectoryConfig config =
-        new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond, 
-                             AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-            .setKinematics(DriveConstants.kDriveKinematics)
-            .addConstraint(autoVoltageConstraint);
-
-    // This trajectory can be modified to suit your purposes
-    // Note that all coordinates are in meters, and follow NWU conventions.
-    // If you would like to specify coordinates in inches (which might be easier
-    // to deal with for the Romi), you can use the Units.inchesToMeters() method
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        List.of(
-            new Translation2d(0.5, 0.25),
-            new Translation2d(1.0, -0.25),
-            new Translation2d(1.5, 0)
-        ),
-        new Pose2d(0.0, 0, new Rotation2d(Math.PI)),
-        config);
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+      exampleTrajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    } catch (IOException ex) {
+      DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+    }
+ 
 
     RamseteCommand ramseteCommand = new RamseteCommand(
-        exampleTrajectory,
+      exampleTrajectory,
         m_drivetrain::getPose,
         new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
         new SimpleMotorFeedforward(DriveConstants.ksVolts, DriveConstants.kvVoltSecondsPerMeter, DriveConstants.kaVoltSecondsSquaredPerMeter),
